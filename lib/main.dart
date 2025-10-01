@@ -28,61 +28,80 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
+  // bool Loading =false;
+  List<CricketMatch> match = [  ];
 
-  bool Loading =false;
-
-  List<CricketMatch> match =[];
-  
-  void initState() {
-
-    super.initState();
-    _call();
-  }
-
+  // void initState() {
+  //
+  //   super.initState();
+  //   _call();
+  // }
+  //
   FirebaseFirestore db = FirebaseFirestore.instance;
-  Future<void> _call ()async{
-    Loading=true;
-    setState(() {
 
-    });
-    match.clear();
-    QuerySnapshot<Map<String, dynamic>> snapshot= await db.collection('cricket').get();
-    for(QueryDocumentSnapshot<Map<String,dynamic>> s in snapshot.docs){
-      print(s.data());
-      print(s.id.toString());
-      print('//////////////');
-      match.add(CricketMatch.fromJson(s.data(),s.id));
-    }
-    Loading=false;
-    setState(() {
-    });
-  }
+  // Future<void> _call ()async{
+  //   Loading=true;
+  //   setState(() {
+  //
+  //   });
+  //   match.clear();
+  //   QuerySnapshot<Map<String, dynamic>> snapshot= await db.collection('cricket').get();
+  //   for(QueryDocumentSnapshot<Map<String,dynamic>> s in snapshot.docs){
+  //     print(s.data());
+  //     print(s.id.toString());
+  //     match.add(CricketMatch.fromJson(s.data(),s.id));
+  //   }
+  //   print(match);
+  //   Loading=false;
+  //   setState(() {
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.white, title: Text("Cricket")),
-      body: Visibility(
-        visible:Loading==false,
-        replacement:Center(child: CircularProgressIndicator(),
-        ),
-        child: ListView.builder(
-          itemCount:match.length,
-            itemBuilder: (context,index){
-          return ListTile(
-            leading:CircleAvatar(backgroundColor:Colors.grey,radius:8,),
-            title:Text("Match number:${match[index].id}"),
-            subtitle:Column(crossAxisAlignment:CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-              Text("Score: ${match[index].run}/${match[index].wicket}"),
-              Text("over:${match[index].over}")
-            ],),
-          );
-        }),
-      )
+      body: StreamBuilder(
+        stream: db.collection('cricket').snapshots(),
+        builder: (context, asyncSnapshot) {
+          if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (asyncSnapshot.hasError) {
+            Center(child: Text(asyncSnapshot.error.toString()));
+          }
+          if (asyncSnapshot.hasData) {
+            match.clear();
+            QuerySnapshot<Map<String, dynamic>> snap = asyncSnapshot.data!;
+
+            for (QueryDocumentSnapshot<Map<String, dynamic>> s in snap.docs) {
+              match.add(CricketMatch.fromJson(s.data(), s.id));
+            }
+            return ListView.builder(
+              itemCount: match.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.grey,
+                    radius: 8,
+                  ),
+                  title: Text("Match number:${match[index].id}"),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("Score: ${match[index].run}/${match[index].wicket}"),
+                      Text("over:${match[index].over}"),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+          return SizedBox();
+        },
+      ),
     );
   }
 }
