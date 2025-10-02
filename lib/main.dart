@@ -1,8 +1,12 @@
 import 'package:fire/UI/LoginScreen.dart';
+import 'package:fire/UI/OtpVerifyScreen.dart';
+import 'package:fire/UI/PhoneAuthScreen.dart';
 import 'package:fire/UI/SignUp.dart';
 import 'package:fire/UI/splashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
+import 'UI/PostScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,17 +24,17 @@ class MyApp extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.purple,width:1),
+            borderSide: BorderSide(color: Colors.purple, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.deepPurple,width:1.5),
+            borderSide: BorderSide(color: Colors.blue, width: 1),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.black,width:1.5),
+            borderSide: BorderSide(color: Colors.white54, width: 1.5),
           ),
-          fillColor:Colors.white,
+          fillColor: Colors.white,
           filled: true,
         ),
         primaryColor: Colors.deepPurple,
@@ -40,8 +44,10 @@ class MyApp extends StatelessWidget {
       routes: {
         Splashscreen.name: (_) => Splashscreen(),
         Loginscreen.name: (_) => Loginscreen(),
-        SignUpscreen.name:(_)=>SignUpscreen(),
-
+        SignUpscreen.name: (_) => SignUpscreen(),
+        PostScreen.name: (_) => PostScreen(),
+        OtpVerifyScreen.name: (_) => OtpVerifyScreen(),
+        PhoneAuthScreen.name: (_) => PhoneAuthScreen(),
       },
     );
   }

@@ -150,4 +150,10 @@ class _SignUpscreenState extends State<SignUpscreen> {
       centerTitle: true,
     );
   }
+  @override
+  void dispose() {
+    super.dispose();
+    _passwordController.dispose();
+    _emailController.dispose();
+  }
 }
