@@ -17,10 +17,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   bool Loading = false;
+
   void initState() {
-    _phoneController.text= "+880";
+    _phoneController.text = "+880";
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,40 +57,48 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   height: 50,
                   width: double.infinity,
-                  child:Loading==false? ElevatedButton(
-                    onPressed: () {
-                     if(_formKey.currentState!.validate()){
-                       Loading=true;
-                       setState(() {
-                       });
-                       firebaseAuth.verifyPhoneNumber(
-                         phoneNumber:_phoneController.text,
-                         verificationCompleted: (v) {
+                  child: Loading == false
+                      ? ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              Loading = true;
+                              setState(() {});
+                              firebaseAuth.verifyPhoneNumber(
+                                phoneNumber: _phoneController.text,
+                                verificationCompleted: (v) {},
+                                verificationFailed: (e) {
+                                  Utils.ShowToastMessage(e.toString());
+                                  Loading = false;
+                                  setState(() {});
+                                },
+                                codeSent: (String VerifyID, int? token) {
+                                  Navigator.pushNamed(
+                                    context,
+                                    OtpVerifyScreen.name,
+                                    arguments: VerifyID,
+                                  );
+                                },
+                                codeAutoRetrievalTimeout: (t) {
+                                  Utils.ShowToastMessage(t.toString());
+                                  Loading = false;
+                                  setState(() {});
+                                },
+                              );
 
-                         },
-                         verificationFailed: (e) {
-                           Utils.ShowToastMessage(e.toString());
-                         },
-                         codeSent: (String VerifyID, int? token) {
-                           Navigator.pushNamed(context, OtpVerifyScreen.name,arguments:VerifyID);
-                         },
-                         codeAutoRetrievalTimeout: (t) {
-                           Utils.ShowToastMessage(t.toString());
-                         },
-                       );
-                       Loading=false;
-                       setState(() {
-                       });
-                     }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text("Next", style: TextStyle(color: Colors.white)),
-                  ):Center(child:CircularProgressIndicator(),),
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            "Next",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        )
+                      : Center(child: CircularProgressIndicator()),
                 ),
                 SizedBox(height: 80),
               ],

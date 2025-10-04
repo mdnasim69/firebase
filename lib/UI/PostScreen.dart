@@ -1,7 +1,8 @@
+import 'package:fire/UI/AddPostScreen.dart';
 import 'package:fire/UI/LoginScreen.dart';
-import 'package:fire/Utils/Utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 
 class PostScreen extends StatefulWidget {
@@ -14,7 +15,6 @@ class PostScreen extends StatefulWidget {
 }
 
 class _PostScreenState extends State<PostScreen> {
-  final TextEditingController _WritetController = TextEditingController();
   FirebaseAuth firebaseAuth1 = FirebaseAuth.instance;
   final firebaseDatabase = FirebaseDatabase.instance.ref('post');
   bool Loading = false;
@@ -41,73 +41,53 @@ class _PostScreenState extends State<PostScreen> {
         title: Text("POST"),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            SizedBox(height: 16),
+      // body: FirebaseAnimatedList(
+      //   query: firebaseDatabase,
+      //   itemBuilder:
+      //       (
+      //         BuildContext context,
+      //         DataSnapshot snapshot,
+      //         Animation<double> animation,
+      //         int index,
+      //       ) {
+      //         return ListTile(
+      //           title: Text(snapshot.child('Description').value.toString()),
+      //           subtitle: Text(snapshot.child('id').value.toString()),
+      //         );
+      //       },
+      // ),
+      body: StreamBuilder(
+        stream: firebaseDatabase.onValue,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data?.snapshot.children.length,
+              itemBuilder: (context, index) {
+                Map<dynamic, dynamic> map =
+                    snapshot.data!.snapshot.value as dynamic;
+                List list = map.values.toList();
+                debugPrint(snapshot.data?.snapshot.children.length.toString());
+                debugPrint(map.toString());
 
-               TextFormField(
-                controller: _WritetController,
-                validator: (String? value) {
-                  if (value!.isEmpty) {
-                    return 'Enter your description';
-                  }
-                  return null;
-                },
-                maxLines: 3,
-                decoration: InputDecoration(
-                  labelText: "description",
-                  hintText: "what's on your mind !",
-                ),
-                keyboardType: TextInputType.phone,
-              ),
-
-            SizedBox(height: 32),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              height: 50,
-              width: double.infinity,
-              child:  Visibility(
-                visible:Loading==false,
-                replacement:Center(child:CircularProgressIndicator(),),
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {Loading = true;});
-                    firebaseDatabase.child(DateTime.now().microsecondsSinceEpoch.toString()).set({
-                      "Description": _WritetController.text,
-                      "id": DateTime.now().microsecondsSinceEpoch.toString(),
-                    }).then((v){
-                      Utils.ShowSucessMessage("added");
-                      setState(() {Loading = false;});
-                    }).onError((e,m){
-                      Utils.ShowToastMessage(e.toString());
-                      setState(() {Loading = false;});
-                    });
-
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text("Post", style: TextStyle(color: Colors.white)),
-                ),
-              )
-            ),
-            SizedBox(height: 80),
-          ],
-        ),
+                return ListTile(
+                  title: Text(list[index]['Description']),
+                  subtitle: Text(list[index]['id']),
+                );
+              },
+            );
+          }
+          return SizedBox();
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, AddPostScreen.name);
+        },
+        child: Icon(Icons.add),
       ),
     );
-  }
-
-
-
-  @override
-  void dispose() {
-    _WritetController.dispose(); // TODO: implement dispose
-    super.dispose();
   }
 }

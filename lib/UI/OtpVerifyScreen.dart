@@ -77,12 +77,12 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                       Loading=true;
                       setState(() {
                       });
-                      final token = PhoneAuthProvider.credential(
+                      final credential = PhoneAuthProvider.credential(
                         verificationId: verifyID!,
                         smsCode: _OtpController.text,
                       );
                       try {
-                       await firebaseAuth.signInWithCredential(token);
+                       await firebaseAuth.signInWithCredential(credential);
                         Navigator.pushNamedAndRemoveUntil(context, PostScreen.name, (predicate)=>false);
                       } catch (e) {
                         Loading=false;

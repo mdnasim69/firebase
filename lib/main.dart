@@ -6,6 +6,7 @@ import 'package:fire/UI/splashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'UI/AddPostScreen.dart';
 import 'UI/PostScreen.dart';
 
 void main() async {
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         PostScreen.name: (_) => PostScreen(),
         OtpVerifyScreen.name: (_) => OtpVerifyScreen(),
         PhoneAuthScreen.name: (_) => PhoneAuthScreen(),
+        AddPostScreen.name: (_) => AddPostScreen(),
       },
     );
   }
