@@ -17,6 +17,7 @@ class PostScreen extends StatefulWidget {
 class _PostScreenState extends State<PostScreen> {
   FirebaseAuth firebaseAuth1 = FirebaseAuth.instance;
   final firebaseDatabase = FirebaseDatabase.instance.ref('post');
+  TextEditingController searchController = TextEditingController();
   bool Loading = false;
 
   @override
@@ -56,31 +57,64 @@ class _PostScreenState extends State<PostScreen> {
       //         );
       //       },
       // ),
-      body: StreamBuilder(
-        stream: firebaseDatabase.onValue,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data?.snapshot.children.length,
-              itemBuilder: (context, index) {
-                Map<dynamic, dynamic> map =
-                    snapshot.data!.snapshot.value as dynamic;
-                List list = map.values.toList();
-                debugPrint(snapshot.data?.snapshot.children.length.toString());
-                debugPrint(map.toString());
-
-                return ListTile(
-                  title: Text(list[index]['Description']),
-                  subtitle: Text(list[index]['id']),
-                );
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: (String c) {
+                setState(() {});
               },
-            );
-          }
-          return SizedBox();
-        },
+              decoration: InputDecoration(
+                hintText: "Search",
+                contentPadding: EdgeInsets.symmetric(horizontal: 16),
+              ),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder(
+              stream: firebaseDatabase.onValue,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    itemCount: snapshot.data?.snapshot.children.length,
+                    itemBuilder: (context, index) {
+                      Map<dynamic, dynamic> map =
+                          snapshot.data!.snapshot.value as dynamic;
+                      List list = map.values.toList();
+                      debugPrint(
+                        snapshot.data?.snapshot.children.length.toString(),
+                      );
+                      debugPrint(map.toString());
+                      String title = list[index]['Description'];
+                      if (searchController.text.isEmpty) {
+                        return ListTile(
+                          title: Text(list[index]['Description']),
+                          subtitle: Text(list[index]['id']),
+                        );
+                      } else if (title.toLowerCase().contains(
+                        searchController.text.toLowerCase(),
+                      )) {
+                        return ListTile(
+                          title: Text(list[index]['Description']),
+                          subtitle: Text(list[index]['id']),
+                        );
+                      }
+                      else{
+                        return Container();
+                      }
+                    },
+                  );
+                }
+                return SizedBox();
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
