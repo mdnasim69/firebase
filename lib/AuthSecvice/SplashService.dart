@@ -15,6 +15,7 @@ class SplashService {
             (predicate) => false,
       );
     }
+    //174789
     else{
       Navigator.pushNamedAndRemoveUntil(
         context,

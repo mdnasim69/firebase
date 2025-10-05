@@ -1,3 +1,4 @@
+import 'package:fire/UI/ForgotPasswordScreen.dart';
 import 'package:fire/UI/PhoneAuthScreen.dart';
 import 'package:fire/UI/PostScreen.dart';
 import 'package:fire/UI/SignUp.dart';
@@ -77,7 +78,23 @@ class _LoginscreenState extends State<Loginscreen> {
                         ? Button()
                         : Center(child: CircularProgressIndicator()),
                   ),
-                  SizedBox(height: 64),
+                  SizedBox(height:8,),
+                  Align(alignment:Alignment.centerRight,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, ForgotPasswordScreen.name);
+                      },
+                      child: Text(
+                        "Forgot password   ",
+                        style: TextStyle(
+                          color: Colors.purpleAccent,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 48),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

@@ -18,6 +18,7 @@ class _PostScreenState extends State<PostScreen> {
   FirebaseAuth firebaseAuth1 = FirebaseAuth.instance;
   final firebaseDatabase = FirebaseDatabase.instance.ref('post');
   TextEditingController searchController = TextEditingController();
+  TextEditingController updateController = TextEditingController();
   bool Loading = false;
 
   @override
@@ -95,6 +96,32 @@ class _PostScreenState extends State<PostScreen> {
                         return ListTile(
                           title: Text(list[index]['Description']),
                           subtitle: Text(list[index]['id']),
+                          trailing: PopupMenuButton(
+                            itemBuilder: (context) {
+                              return [
+                                PopupMenuItem(
+                                  value: 1,
+                                  onTap: () {
+                                    updateTitle(title,list[index]['id']);
+                                  },
+                                  child: ListTile(
+                                    title: Icon(Icons.edit),
+                                    subtitle: Text("Update"),
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: 2,
+                                  onTap: () {
+                                    firebaseDatabase.child(list[index]['id']).remove();
+                                  },
+                                  child: ListTile(
+                                    title: Icon(Icons.delete),
+                                    subtitle: Text("Delete"),
+                                  ),
+                                ),
+                              ];
+                            },
+                          ),
                         );
                       } else if (title.toLowerCase().contains(
                         searchController.text.toLowerCase(),
@@ -103,8 +130,7 @@ class _PostScreenState extends State<PostScreen> {
                           title: Text(list[index]['Description']),
                           subtitle: Text(list[index]['id']),
                         );
-                      }
-                      else{
+                      } else {
                         return Container();
                       }
                     },
@@ -122,6 +148,29 @@ class _PostScreenState extends State<PostScreen> {
         },
         child: Icon(Icons.add),
       ),
+    );
+  }
+
+  Future<void> updateTitle(String details,String id) async {
+    updateController.text=details;
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title:Text("Update"),
+          content:TextField(
+            decoration:InputDecoration(),
+            controller: updateController,
+          ),
+          actions: [
+            TextButton(onPressed: (){Navigator.pop(context);}, child: Text("Cancel")),
+            TextButton(onPressed: (){
+              firebaseDatabase.child(id).update({"Description":updateController.text});
+              Navigator.pop(context);
+              }, child: Text("Update")),
+          ],
+        );
+      },
     );
   }
 }
