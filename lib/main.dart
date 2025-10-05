@@ -1,13 +1,17 @@
-import 'package:fire/FCM_service.dart';
-import 'package:fire/cricket.dart';
+import 'package:fire/UI/LoginScreen.dart';
+import 'package:fire/UI/OtpVerifyScreen.dart';
+import 'package:fire/UI/PhoneAuthScreen.dart';
+import 'package:fire/UI/SignUp.dart';
+import 'package:fire/UI/splashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'UI/AddPostScreen.dart';
+import 'UI/PostScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FCM_service().initalize();
   runApp(const MyApp());
 }
 
@@ -16,73 +20,37 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: MyHomePage());
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  @override
-
-  bool Loading =false;
-
-  List<CricketMatch> match =[];
-  
-  void initState() {
-
-    super.initState();
-    _call();
-  }
-
-  FirebaseFirestore db = FirebaseFirestore.instance;
-  Future<void> _call ()async{
-    Loading=true;
-    setState(() {
-
-    });
-    match.clear();
-    QuerySnapshot<Map<String, dynamic>> snapshot= await db.collection('cricket').get();
-    for(QueryDocumentSnapshot<Map<String,dynamic>> s in snapshot.docs){
-      print(s.data());
-      print(s.id.toString());
-      print('//////////////');
-      match.add(CricketMatch.fromJson(s.data(),s.id));
-    }
-    Loading=false;
-    setState(() {
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.white, title: Text("Cricket")),
-      body: Visibility(
-        visible:Loading==false,
-        replacement:Center(child: CircularProgressIndicator(),
+    return MaterialApp(
+      theme: ThemeData(
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.purple, width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.blue, width: 1.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.white54, width: 1.5),
+          ),
+          fillColor: Colors.white,
+          filled: true,
         ),
-        child: ListView.builder(
-          itemCount:match.length,
-            itemBuilder: (context,index){
-          return ListTile(
-            leading:CircleAvatar(backgroundColor:Colors.grey,radius:8,),
-            title:Text("Match number:${match[index].id}"),
-            subtitle:Column(crossAxisAlignment:CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-              Text("Score: ${match[index].run}/${match[index].wicket}"),
-              Text("over:${match[index].over}")
-            ],),
-          );
-        }),
-      )
+        primaryColor: Colors.deepPurple,
+      ),
+      debugShowCheckedModeBanner: false,
+      initialRoute: Splashscreen.name,
+      routes: {
+        Splashscreen.name: (_) => Splashscreen(),
+        Loginscreen.name: (_) => Loginscreen(),
+        SignUpscreen.name: (_) => SignUpscreen(),
+        PostScreen.name: (_) => PostScreen(),
+        OtpVerifyScreen.name: (_) => OtpVerifyScreen(),
+        PhoneAuthScreen.name: (_) => PhoneAuthScreen(),
+        AddPostScreen.name: (_) => AddPostScreen(),
+      },
     );
   }
 }
